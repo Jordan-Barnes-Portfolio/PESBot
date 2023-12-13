@@ -118,6 +118,19 @@ class Util:
         finally:
             process.close()
 
+    def read_byte_values(self, address):
+        try:
+            rwm = ReadWriteMemory()
+            process = rwm.get_process_by_id(self.PID)
+            process.open()
+            byte_val = process.read(address)
+            return byte_val
+        except Exception as e:
+            print(e)
+            return None
+        finally:
+            process.close()
+
         
     """
         Gets a process ID given its name, IE Java.exe = 32800
@@ -175,6 +188,15 @@ class Util:
                     min_address = hex(int(x.split(":")[1], 16))
         return min_address, max_address
 
+    """
+        Converts a float to a hex string.
+        @param float_val: a float value IE 0.0
+        @return: hex string IE "0x00 0x00 0x00 0x00"
+    """
+    @staticmethod
+    def convert_float_to_hex(float_val):
+        return hex(struct.unpack('<I', struct.pack('<f', float_val))[0])
+    
     """
         Parses the input string as a list of lists.
         @param input_string: a string representing a list of lists IE "[[l,l][x,x]]"

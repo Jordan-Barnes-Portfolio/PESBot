@@ -1,4 +1,4 @@
 C:\\Users\\Jordan\\Desktop\\Programming\\GIT\\PESBot\Python_\Scripts\main.py
-C:\\Users\\Jordan\\Desktop\\Programming\\GIT\\PESBot\Python_\Scripts\dist\AOBScanner\AOBScanner.exe
+C:\\Users\\Jordan\\Desktop\\Programming\\GIT\\PESBot\Executables\AOBScanner.exe
 C:\\Users\\Jordan\\Desktop\\Programming\\GIT\\PESBot\DATA_\DATA.txt
 C:\\Users\\Jordan\\Desktop\\Programming\\GIT\\PESBot\DATA_\MIN_MAX_ADDRESSES.txt

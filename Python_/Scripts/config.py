@@ -14,9 +14,10 @@ class Config():
             self.PATH = f.read()
 
         self.MAIN_PATH = self.PATH + "\\Python_\\Scripts\\main.py"
-        self.SCANNER_PATH = self.PATH + "\\Python_\\Scripts\\dist\\AOBScanner\\AOBScanner.exe"
+        self.SCANNER_PATH = self.PATH + "\\Executables\\AOBScanner.exe"
         self.DATA_PATH = self.PATH + "\\DATA_\\DATA.txt"
         self.ADDRESSES_PATH = self.PATH + "\\DATA_\\MIN_MAX_ADDRESSES.txt"
+        self.PLAYER_LAST_LOCATION = self.PATH + "\\DATA_\\PLAYER_LAST_LOCATION.txt"
 
         with open(self.CURRENT_DIR + "\\path.txt", "w") as f:
             f.write(self.MAIN_PATH + "\n" + self.SCANNER_PATH + "\n" + self.DATA_PATH + "\n" + self.ADDRESSES_PATH)
