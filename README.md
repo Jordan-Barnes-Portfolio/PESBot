@@ -1,5 +1,4 @@
 PESBot
 
-A bot for an online video game.
-
-Contains a custom built memory scanner written in cython.
+This is a memory scanner.  Currently, its outfitted to be used against a french popular MMORPG "WAKFU"
+ 
