@@ -49,6 +49,24 @@ If the pattern is found, it writes the memory address to a file.
 """
 def scan_memory(start_address=start_address, end_address=end_address):
     print("Scanning memory for player pointer...")
+    print("\n(ENTER):Use default Eca Telport location\n(2): Use players last location\n(3): Enter player location\n")
+    input_ = input("Input: ")
+    if input_.lower() == "2":
+        with open("C:/Users/Jordan/Desktop/Programming/GIT/PESBot/DATA_/PLAYER_LAST_LOCATION.txt", "r") as f:
+            line = f.readline()
+            x, y = line.split(":")  
+            bytes_ = util.coords_to_little_endian(int(x), int(y))[0]
+            print(f"Searching bytes: {bytes_}")
+    elif input_.lower() == "3":
+        try:
+            resp = input("\nEnter player location in format \'x:y\': ")
+            x, y = resp.split(":")  
+            bytes_ = util.coords_to_little_endian(int(x), int(y))[0]
+        except:
+            print("Invalid input.  Using default location.")
+            bytes_ = b'\x00\x00\x00\x00\x00\x00\x60\xC1\x00\x00\xC0\x41\x00\x00\x00\x01'
+    else:
+        bytes_ = b'\x00\x00\x00\x00\x00\x00\x60\xC1\x00\x00\xC0\x41\x00\x00\x00\x01'
     # Open the process
     process_id = util.get_pid_by_name("java.exe")
     process_handle = ctypes.windll.kernel32.OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
@@ -67,10 +85,10 @@ def scan_memory(start_address=start_address, end_address=end_address):
                 print(f"\rProgress: {progress:.2f}%", end='', flush=True)
 
                 result = read_process_memory(process_handle, memory_address, memory_size) #read result from memory
-                
+
                 larger_chunk = result
                 #search_array = b'\x6A\x61\x72\x3A\x66\x69\x6C\x65\x3A\x2E\x2F\x63\x6F\x6E\x74\x65\x6E\x74\x73\x2F\x70\x61\x72\x74\x69\x63\x6C\x65\x73\x2F\x70\x61\x72\x74\x69\x63\x6C\x65\x73\x2E\x6A\x61\x72\x21\x2F\x38\x30\x30'
-                search_array = b'\x00\x00\x00\x00\x00\x00\x60\xC1\x00\x00\xC0\x41\x00\x00\x00\x01'
+                search_array = bytes_
                 
                 larger_chunk_array = (ctypes.c_byte * len(larger_chunk)).from_buffer_copy(larger_chunk)
                 search_array_array = (ctypes.c_byte * len(search_array)).from_buffer_copy(search_array)

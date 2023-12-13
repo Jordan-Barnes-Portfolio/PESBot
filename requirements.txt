@@ -1,0 +1,10 @@
+pip install numpy
+pip install torch
+pip install torchvision
+pip install pillow
+pip install pyautogui
+pip install keyboard
+pip install psutil
+pip install pywin32
+pip install ReadWriteMemory
+pip install opencv-python

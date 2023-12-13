@@ -18,7 +18,9 @@ class Config():
         self.DATA_PATH = self.PATH + "\\DATA_\\DATA.txt"
         self.ADDRESSES_PATH = self.PATH + "\\DATA_\\MIN_MAX_ADDRESSES.txt"
         self.PLAYER_LAST_LOCATION = self.PATH + "\\DATA_\\PLAYER_LAST_LOCATION.txt"
-
+        self.MINERAL_JSON_PATH = self.PATH + "\\DATA_\\json\\mineral_points.json"
+        self.PATHING_JSON_PATH = self.PATH + "\\DATA_\\json\\pathing_points.json"
+        
         with open(self.CURRENT_DIR + "\\path.txt", "w") as f:
             f.write(self.MAIN_PATH + "\n" + self.SCANNER_PATH + "\n" + self.DATA_PATH + "\n" + self.ADDRESSES_PATH)
 

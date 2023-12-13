@@ -4,6 +4,9 @@ import ast
 from ReadWriteMemory import ReadWriteMemory
 import numpy
 import struct
+import math
+import ctypes as c
+from pymem import Pymem
 
 
 """
@@ -28,6 +31,9 @@ class Util:
     def __init__(self, DATA_PATH = None, AOB_PATH = None):
         self.DATA_PATH = "C:/Users/Jordan/Desktop/Programming/GIT/PESBot/DATA_/DATA.txt"
         self.PID = self.get_pid_by_name("java.exe")
+
+
+        
     """
         Formats a byte string to be used in a scan.
         @param: byte_string: a string of hex values IE "0x00 0x00 0x00 0x00"
@@ -55,69 +61,121 @@ class Util:
             #IE 40 00 00 00 becomes  00 00 00 40
         
         return ' '.join([result[i:i+2] for i in range(0, len(result), 2)])
-
-    # """
-    #     !!!!!!!!!!!! NOT USED !!!!!!!!!!!!
-
-    #     Runs an Array of Bytes scan.
-
-    #     Opens the scanner, performs a scan, and saves the result to a file.
-    # """
-    # def run_aob_scan(self):
-        
-    #     file = open(self.DATA_PATH, 'w')
-    #     file.close()
-
-    #     try:
-    #         # Use subprocess.run() to start the executable
-    #         proc = subprocess.Popen([self.AOB_PATH])
-    #     except Exception as e:
-    #         print(f"Error: {e}")
-
-    #     time.sleep(2)
-
-    #     if "cheatengine-x86_64-SSE4-AVX2.exe" in (i.name() for i in psutil.process_iter()):
-    #         while(True):
-    #             if(os.stat(self.DATA_PATH).st_size == 0):
-    #                 print("\rProcessing, please wait.", end='', flush=True)
-    #             else:
-    #                 print("\rData loaded.             ", end='', flush=True)
-    #                 break
-    
     
 
+
+    """
+        Calculates the vector of two points, scales it by {scale_factor} factor, and sets
+        the maximum length of the radial line by {max_length}.
+        @param: p1: x1, y1
+        @param: p2: x2, y2
+        @param: scale_factor: factor to scale the vector by
+        @param: max_length: maximum length of the radial line
+        @return: scaled_p2: scaled x2, y2
+
+        # Example usage:
+        # pixel_cord_1 = (500, 400)
+        # pixel_cord_2 = (630, 699)
+
+        #These are defaulted and do not need to be added
+        # scale_factor = 0.8 # Set your factor
+        # max_length = 100  # Set your desired maximum length
+
+        # pg.moveTo(calculate_vector(p1, p2))
+    """
+    def calculate_vector(self, p1, p2, scale_factor=0.8, max_length=100):
+        x1, y1 = p1
+        x2, y2 = p2
+
+        # Calculate the components of the original vector
+        original_vector = (x2 - x1, y2 - y1)
+
+        # Scale the vector components
+        scaled_vector = (scale_factor * original_vector[0], scale_factor * original_vector[1])
+
+        # Check if a maximum length is specified
+        if max_length is not None:
+            # Calculate the magnitude of the scaled vector
+            scaled_magnitude = math.sqrt(scaled_vector[0] ** 2 + scaled_vector[1] ** 2)
+
+            # If the magnitude exceeds the maximum length, normalize the vector
+            if scaled_magnitude > max_length:
+                normalized_vector = (scaled_vector[0] / scaled_magnitude, scaled_vector[1] / scaled_magnitude)
+                scaled_vector = (max_length * normalized_vector[0], max_length * normalized_vector[1])
+
+        # Calculate the coordinates of the scaled vector
+        scaled_p2 = (x1 + scaled_vector[0], y1 + scaled_vector[1])
+
+        return scaled_p2
+    
+
+
+    """
+        Calculates the cells required to mvoe between two points on an isometric grid.
+        @param: start_pos: x1, y1 (player position)
+        @param: target_pos: x2, y2 (target position (Mineral, NPC, etc))
+        @return: cells: x, y (cells required to move between the two points)
+    """
+    def calculate_cells(self, start_pos, target_pos):
+        return (target_pos[0]-start_pos[0], start_pos[1]-target_pos[1])
+    
     """
         Reads players x pointer, and adds the y pointer offset to it.
 
         @Return: both the x and y pointer values.
     """
-    def read_coordinates(self):
+    def read_coordinates(self, flag):
         try:
             with open(self.DATA_PATH, 'r') as file:
                 data = file.readlines()
 
             data = data[0].upper()
             x_ptr,  y_ptr = int(data, 16), int(data, 16) + 4
-
-            rwm = ReadWriteMemory()
-            process = rwm.get_process_by_id(self.PID)
-
-            process.open()
-                
-            # Initializes pointers from DATA file.
-            if x_ptr is None or y_ptr is None:
-                raise ValueError("Failed to get valid pointers from the data file.")
-
-            x_val = process.read(x_ptr)
-            y_val = process.read(y_ptr)
-
-            return int(Util.convert_to_float(self, x_val)), int(Util.convert_to_float(self, y_val))
+        
+            #testing pymem
+            pymem = Pymem("java.exe")
+            
+            return [int(pymem.read_float(x_ptr)), int(pymem.read_float(y_ptr))]
         except Exception as e:
-            print(e)
-            return None, None
-        finally:
-            process.close()
+            print("Error in reading memory: ", e)
 
+
+            #     x_other = int(data, 16) + 40
+            #     y_other = x_other + 4
+            #     rwm = ReadWriteMemory()
+            #     process = rwm.get_process_by_id(self.PID)
+
+            #     process.open()
+                
+            #     # Initializes pointers from DATA file.
+            #     if x_ptr is None or y_ptr is None:
+            #         raise ValueError("Failed to get valid pointers from the data file.")
+                
+            #     #Checks if pointer values are valid, if they arent we run the flag check.
+            #     if(flag):
+            #         # Read the values from the pointers.
+            #         x_val = process.read(x_ptr)
+            #         y_val = process.read(y_ptr)
+            #     else:
+            #         # Read the values from the pointers.
+            #         x_val = process.read(x_other)
+            #         y_val = process.read(y_other)   
+
+            #     return int(Util.convert_to_float(self, x_val)), int(Util.convert_to_float(self, y_val))
+            # finally:
+            #     try:
+            #         if process:
+            #             process.close()
+            #     except Exception as e:
+            #         pass
+    
+
+
+    """
+        Reads a byte value from a given address.
+        @param: address: memory address to read from
+        @return: byte_val: byte value at the given address
+    """
     def read_byte_values(self, address):
         try:
             rwm = ReadWriteMemory()
@@ -131,7 +189,36 @@ class Util:
         finally:
             process.close()
 
-        
+
+
+    """
+        Reads a float value from a given address, and converts it to little endian.
+        @param: address: memory address to read from
+        @return: float_val: bytes X and Y at the given address
+    """
+    def coords_to_little_endian(self, x, y):
+        # Decimal value
+        decimal_value_x = x
+        decimal_value_y = y
+
+        # Convert to 4-byte float in little-endian format
+        float_bytes_x = struct.pack('<f', decimal_value_x)
+
+        # Convert bytes to hexadecimal
+        hex_representation_x = ''.join(format(byte, '02x') for byte in float_bytes_x)
+
+        # Decimal value
+        # Convert to 4-byte float in little-endian format
+        float_bytes_y = struct.pack('<f', decimal_value_y)
+
+        # Convert bytes to hexadecimal
+        hex_representation_y = ''.join(format(byte, '02x') for byte in float_bytes_y)
+
+        # Convert hexadecimal strings to bytes
+        bytes_x = bytes.fromhex(hex_representation_x.upper())
+        bytes_y = bytes.fromhex(hex_representation_y.upper())
+    
+        return [bytes_x + bytes_y]
     """
         Gets a process ID given its name, IE Java.exe = 32800
     """    
@@ -142,6 +229,8 @@ class Util:
                 pid = proc.info['pid']
                 break
         return pid
+    
+
 
     """
         Returns the slope of a line given x1, y1, x2, y2
@@ -153,6 +242,8 @@ class Util:
     def get_slope(self, x1, y1, x2, y2):
        
         return ((y2 - y1) / (x2 - x1)) if (x2 - x1) != 0 else None
+    
+
 
     """
         Sets the windows frame to static dimensions.
@@ -163,6 +254,9 @@ class Util:
         
         hwnd = win32gui.FindWindow(None, name)
         win32gui.MoveWindow(hwnd, 0, 0, width, height, True)
+
+
+
 
     """
         Gets a Window handle based on its name, IE "WAKFU"
