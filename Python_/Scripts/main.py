@@ -1,10 +1,14 @@
 from player import Player
 from utils import Util
+from config import Config
 import os
 
+
 util = Util()
-SCANNER_PATH = 'C:/Users/Jordan/Desktop/Programming/GIT/PESBot/Python_/Scripts/dist/AOBScanner/AOBScanner.exe'
-MAIN_PATH = "C:/Users/Jordan/Desktop/Programming/GIT/PESBot/Python_/Scripts/main.py"
+config = Config()
+
+MAIN_PATH = config.MAIN_PATH
+SCANNER_PATH = config.SCANNER_PATH
 
 resp = input("Do you want to use last saved memory location? (y/n) \nInput: ")
 resp = resp.lower()

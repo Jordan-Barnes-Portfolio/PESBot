@@ -89,7 +89,6 @@ def scan_memory(start_address=start_address, end_address=end_address):
                     print(f"\rProgress: {progress:.2f}%", end='', flush=True)
 
                     addresses_found.append(hex(memory_address+index))
-                    util.min_max_of_address(addresses_found[0])
                     print("\nAddress found. Writing to file...")
                     with open("C:/Users/Jordan/Desktop/Programming/GIT/PESBot/DATA_/DATA.txt", "w") as f:
                         f.write(addresses_found[0].split("0x")[1])
@@ -97,6 +96,7 @@ def scan_memory(start_address=start_address, end_address=end_address):
                 
                 memory_address += MAX_BUFFER_SIZE #add buffer size
                 memory_address = memory_address - len(search_array) #subtract pattern size
+
             except Exception as e:
                 print(f"\rProgress: {progress:.2f}%", end='', flush=True)
                 continue
@@ -113,7 +113,14 @@ def scan_memory(start_address=start_address, end_address=end_address):
     else:
         print(f"Failed to open process with ID {process_id}.")
 
-scan_memory()
+print("Starting AOB scan...")
+time.sleep(1)
+try:
+    scan_memory()
+except Exception as e:
+    print(f"Error: {e}")
+    input("Press enter to exit...")
+
 if(num_results>0):  
     print("\nDone. ", addresses_found)
     input("Press enter to exit...")
@@ -124,4 +131,3 @@ else:
     input("Press enter to exit...")
 
     
-

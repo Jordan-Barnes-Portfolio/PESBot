@@ -245,4 +245,3 @@ class Util:
         integer_value = numpy.array(value).astype(numpy.int32)
         return struct.unpack('!f', struct.pack('!i', integer_value))[0]
     
-    
